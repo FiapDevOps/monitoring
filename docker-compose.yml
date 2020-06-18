@@ -1,0 +1,54 @@
+version: '3.8'
+  
+services:
+
+  spring-app:
+    build:
+      context: ./build/initial
+    ports:
+      - 8080:8080        
+    networks:
+       monitoring:
+
+  consul:
+    image: consul
+    ports:
+      - 8500:8500
+      - 8600:8600/udp
+    command: consul agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0 -data-dir=/consul/data
+    volumes:
+      - consul_data:/consul/data  
+    networks:
+       monitoring:
+
+  prometheus:
+    image: prom/prometheus:v2.17.1
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./rules.yml:/etc/prometheus/rules.yml
+    ports:
+      - 9090:9090
+    networks:
+       monitoring:
+
+  node-exporter:
+    image: prom/node-exporter:v0.18.0
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+       monitoring:
+
+volumes:
+  consul_data:
+     name: consul_data
+
+networks:
+  monitoring:
+     name: monitoring
