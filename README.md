@@ -121,7 +121,7 @@ curl http://127.0.0.1:8500/v1/status/leader
 }
 ```
 
-4.3 Primeiro verifique os serviços cadastrados:
+4.3 Faça um cadastro manual do serviço:
 
 ```sh
 curl \

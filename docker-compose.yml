@@ -21,6 +21,15 @@ services:
     networks:
        monitoring:
 
+  consul-exporter:
+    image: prom/consul-exporter:latest
+    ports:
+      - 9107:9107
+    command:
+      - '--consul.server=consul:8500'
+    networks:
+       monitoring:
+
   prometheus:
     image: prom/prometheus:v2.17.1
     volumes:
@@ -44,6 +53,14 @@ services:
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
     networks:
        monitoring:
+
+#  registrator:
+#    image: gliderlabs/registrator:latest
+#    command: consul://consul:8500
+#    volumes:
+#      -  "/var/run/docker.sock:/tmp/docker.sock"
+#    networks:
+#       monitoring:
 
 volumes:
   consul_data:
